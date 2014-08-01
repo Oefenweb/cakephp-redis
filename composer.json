@@ -17,6 +17,9 @@
 		"php": ">=5.3.10",
 		"composer/installers": "~1.0"
 	},
+	"suggest": {
+		"ext-redis": "The native phpredis extension (https://github.com/nicolasff/phpredis/) is required"
+	},
 	"support": {
 		"issues": "https://github.com/Oefenweb/cakephp-redis/issues",
 		"source": "https://github.com/Oefenweb/cakephp-redis"
