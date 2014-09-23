@@ -1,13 +1,14 @@
-# Redis plugin for CakePHP
+# Redis (DataSource) plugin for CakePHP
 
 [![Build Status](https://travis-ci.org/Oefenweb/cakephp-redis.png?branch=master)](https://travis-ci.org/Oefenweb/cakephp-redis) [![Coverage Status](https://coveralls.io/repos/Oefenweb/cakephp-redis/badge.png)](https://coveralls.io/r/Oefenweb/cakephp-redis)
 
-The Redis plugin ...
+The Redis (DataSource) plugin ...
 
 ## Requirements
 
 * CakePHP 2.0 or greater.
 * PHP 5.3.10 or greater.
+* PhpRedis.
 
 ## Installation
 

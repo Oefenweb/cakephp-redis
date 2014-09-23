@@ -1,6 +1,6 @@
 {
 	"name": "oefenweb/cakephp-redis",
-	"description": "A Redis Plugin for CakePHP",
+	"description": "A Redis (DataSource) Plugin for CakePHP",
 	"type": "cakephp-plugin",
 	"keywords": [
 		"cakephp", "redis"
