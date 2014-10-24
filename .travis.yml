@@ -4,18 +4,19 @@ php:
   - 5.3
   - 5.4
   - 5.5
+  - 5.6
 
 env:
   global:
     - REPO_NAME=cakephp-redis
     - PLUGIN_NAME=Redis
     - REQUIRE=""
-    - DB=mysql CAKE_VERSION=master
+    - DB=redis CAKE_VERSION=master
 
   matrix:
-    - DB=mysql CAKE_VERSION=2.3
-    - DB=mysql CAKE_VERSION=2.4
-    - DB=mysql CAKE_VERSION=2.5
+    - DB=redis CAKE_VERSION=2.3
+    - DB=redis CAKE_VERSION=2.4
+    - DB=redis CAKE_VERSION=2.5
 
 matrix:
   include:

@@ -52,6 +52,13 @@ class RedisSource extends DataSource {
 	public $connected = false;
 
 /**
+ * Whether or not source data like available tables and schema descriptions should be cached.
+ *
+ * @var bool
+ */
+	public $cacheSources = false;
+
+/**
 	* Constructor.
 	*
 	* @param array $config Array of configuration information for the Datasource
@@ -64,6 +71,8 @@ class RedisSource extends DataSource {
 			return false;
 		}
 
+		$this->_connection = new Redis();
+
 		return $this->connect();
 	}
 
@@ -73,6 +82,7 @@ class RedisSource extends DataSource {
  *  Closes the connection to the host (if needed).
  *
  * @return void
+ * @todo Write test
  */
 	public function __destruct() {
 		if (!$this->config['persistent']) {
@@ -86,8 +96,13 @@ class RedisSource extends DataSource {
  * @param string $name The name of the method being called
  * @param array $arguments An enumerated array containing the parameters passed to the method
  * @return mixed Method return value
+ * @todo Throw exception(s)
  */
 	public function __call($name, $arguments) {
+		if (!method_exists($this->_connection, $name)) {
+			return false;
+		}
+
 		return call_user_func_array(array($this->_connection, $name), $arguments);
 	}
 
@@ -115,7 +130,7 @@ class RedisSource extends DataSource {
 		$this->connected = $this->_connect();
 		$this->connected = $this->connected && $this->_authenticate();
 		$this->connected = $this->connected && $this->_select();
-		$this->connected = $this->connected && !$this->_setPrefix();
+		$this->connected = $this->connected && $this->_setPrefix();
 
 		return $this->connected;
 	}
@@ -126,9 +141,8 @@ class RedisSource extends DataSource {
  * @return bool True if connecting to the DataSource succeeds, else false
  */
 	protected function _connect() {
+		// TODO: Remove useless try / catch?
 		try {
-			$this->_connection = new Redis();
-
 			if ($this->config['unix_socket']) {
 				return $this->_connection->connect($this->config['unix_socket']);
 			} elseif (!$this->config['persistent']) {
@@ -192,6 +206,7 @@ class RedisSource extends DataSource {
  * @return bool Always true
  */
 	public function close() {
+		// TODO: Remove useless condition
 		if ($this->isConnected()) {
 			$this->_connection->close();
 		}
@@ -216,9 +231,10 @@ class RedisSource extends DataSource {
  *
  * @param mixed $data List of tables
  * @return array Array of sources available in this datasource
+ * @todo: Remove useless method?
  */
 	public function listSources($data = null) {
-		return null;
+		return parent::listSources($data);
 	}
 
 /**
@@ -226,9 +242,10 @@ class RedisSource extends DataSource {
  *
  * @param Model|string $model Name of database table to inspect or model instance
  * @return array Array of Metadata for the $model
+ * @todo: Remove useless method?
  */
 	public function describe($model) {
-		return null;
+		return parent::describe($model);
 	}
 
 /**
@@ -238,6 +255,7 @@ class RedisSource extends DataSource {
  * @param string $func Lowercase name of SQL function, i.e. 'count' or 'max'
  * @param array $params Function parameters (any values must be quoted manually)
  * @return string An SQL calculation function
+ * @todo Remove useless method?
  */
 	public function calculate(Model $Model, $func, $params = array()) {
 		return array('count' => true);
