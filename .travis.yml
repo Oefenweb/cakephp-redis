@@ -33,8 +33,8 @@ matrix:
 before_script:
   - git clone -b master https://github.com/FriendsOfCake/travis.git --depth 1 ../travis
   - ../travis/before_script.sh
-  - pwd && ls
-  - wget https://github.com/nicolasff/phpredis/archive/2.2.5.zip -O php-redis.zip && unzip php-redis.zip && cd phpredis-2.2.5/ && phpize && ./configure && make && make install && echo \"extension=redis.so\" >> `php --ini | grep \"Loaded Configuration\" | sed -e \"s|.*:\s*||\"`
+  - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - phpenv rehash
 
 script:
   - ../travis/script.sh
