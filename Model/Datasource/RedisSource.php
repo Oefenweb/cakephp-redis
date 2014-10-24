@@ -59,11 +59,11 @@ class RedisSource extends DataSource {
 	public $cacheSources = false;
 
 /**
-	* Constructor.
-	*
-	* @param array $config Array of configuration information for the Datasource
-	* @return bool True if connecting to the DataSource succeeds, else false
-	*/
+ * Constructor.
+ *
+ * @param array $config Array of configuration information for the Datasource
+ * @return bool True if connecting to the DataSource succeeds, else false
+ */
 	public function __construct($config = array()) {
 		parent::__construct($config);
 
