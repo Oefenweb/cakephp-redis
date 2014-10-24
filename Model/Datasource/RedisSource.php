@@ -20,12 +20,12 @@ class RedisSource extends DataSource {
  * @var array
  */
 	protected $_baseConfig = array(
-		'server' => '127.0.0.1',
+		'host' => '127.0.0.1',
 		'port' => 6379,
 		'password' => '',
 		'database' => 0,
 		'timeout' => 0,
-		'persistent' => true,
+		'persistent' => false,
 		'unix_socket' => '',
 		'prefix' => '',
 	);
@@ -45,37 +45,32 @@ class RedisSource extends DataSource {
 	protected $_connection = null;
 
 /**
- * Constructor.
+ * Whether or not we are connected to the DataSource.
  *
- *   Opens the connection to the server (if needed).
- *
- * @param array $config Array of configuration information for the Datasource
- * @param bool $autoConnect Whether or not the datasource should automatically connect
- * @return bool If autoconnect is true, true if the database could be connected, else false, otherwise, (always) true
- * @throws MissingConnectionException when a connection cannot be made
+ * @var bool
  */
-	public function __construct($config = null, $autoConnect = true) {
+	public $connected = false;
+
+/**
+	* Constructor.
+	*
+	* @param array $config Array of configuration information for the Datasource
+	* @return bool True if connecting to the DataSource succeeds, else false
+	*/
+	public function __construct($config = array()) {
 		parent::__construct($config);
 
 		if (!$this->enabled()) {
-			throw new MissingConnectionException(array(
-				'class' => get_class($this),
-				'message' => __d('cake_dev', 'Selected driver is not enabled'),
-				'enabled' => false
-			));
+			return false;
 		}
 
-		if ($autoConnect) {
-			return $this->connect();
-		}
-
-		return true;
+		return $this->connect();
 	}
 
 /**
  * Destructor.
  *
- *   Closes the connection to the server (if needed).
+ *  Closes the connection to the host (if needed).
  *
  * @return void
  */
@@ -86,7 +81,18 @@ class RedisSource extends DataSource {
 	}
 
 /**
- * Check that the redis extension is installed/loaded.
+ * Passes (non-existing) method calls to `Redis`.
+ *
+ * @param string $name The name of the method being called
+ * @param array $arguments An enumerated array containing the parameters passed to the method
+ * @return mixed Method return value
+ */
+	public function __call($name, $arguments) {
+		return call_user_func_array(array($this->_connection, $name), $arguments);
+	}
+
+/**
+ * Check that the redis extension is loaded.
  *
  * @return bool Whether or not the extension is loaded
  */
@@ -97,21 +103,87 @@ class RedisSource extends DataSource {
 /**
  * Connects to the database using options in the given configuration array.
  *
- * @return bool True if the database could be connected, else false
- * @throws MissingConnectionException
+ *  "Connects mean:
+ *  - connect
+ *  - authenticate
+ *  - select
+ *  - setPrefix
+ *
+ * @return bool
  */
 	public function connect() {
-		$this->connected = false;
-
-		try {
-			$this->_connection = new Redis();
-			$this->connected = true;
-
-		} catch (Exception $e) {
-			throw new MissingConnectionException(array('class' => get_class($this), 'message' => $e->getMessage()));
-		}
+		$this->connected = $this->_connect();
+		$this->connected = $this->connected && $this->_authenticate();
+		$this->connected = $this->connected && $this->_select();
+		$this->connected = $this->connected && !$this->_setPrefix();
 
 		return $this->connected;
+	}
+
+/**
+ * Connects to the database using options in the given configuration array.
+ *
+ * @return bool True if connecting to the DataSource succeeds, else false
+ */
+	protected function _connect() {
+		try {
+			$this->_connection = new Redis();
+
+			if ($this->config['unix_socket']) {
+				return $this->_connection->connect($this->config['unix_socket']);
+			} elseif (!$this->config['persistent']) {
+				return $this->_connection->connect(
+					$this->config['host'], $this->config['port'], $this->config['timeout']
+				);
+			} else {
+				$persistentId = crc32(serialize($this->config));
+
+				return $this->_connection->pconnect(
+					$this->config['host'], $this->config['port'], $this->config['timeout'], $persistentId
+				);
+			}
+		} catch (RedisException $e) {
+			return false;
+		}
+	}
+
+/**
+ * Authenticates to the database (if needed) using options in the given configuration array.
+ *
+ * @return bool True if the authentication succeeded or no password was specified, else false
+ */
+	protected function _authenticate() {
+		if ($this->config['password']) {
+			return $this->_connection->auth($this->config['password']);
+		}
+
+		return true;
+	}
+
+/**
+ * Selects a database (if needed) using options in the given configuration array.
+ *
+ * @return bool True if the select succeeded or no database was specified, else false
+ */
+	protected function _select() {
+		if ($this->config['database']) {
+			return $this->_connection->select($this->config['database']);
+		}
+
+		return true;
+	}
+
+/**
+ * Sets a prefix for all keys (if needed) using options in the given configuration array.
+ *
+ * @return bool True if setting the prefix succeeded or no prefix was specified, else false
+ */
+	protected function _setPrefix() {
+		if ($this->config['prefix']) {
+			return $this->_connection->setOption(Redis::OPT_PREFIX, $this->config['prefix']);
+		}
+
+		return true;
 	}
 
 /**
@@ -122,10 +194,10 @@ class RedisSource extends DataSource {
 	public function close() {
 		if ($this->isConnected()) {
 			$this->_connection->close();
-			unset($this->_connection);
 		}
 
 		$this->connected = false;
+		$this->_connection = null;
 
 		return true;
 	}
