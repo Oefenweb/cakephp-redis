@@ -153,32 +153,6 @@ class RedisSourceTest extends CakeTestCase {
 	}
 
 /**
- * testConnectException method
- *
- * @return void
- */
-	public function testConnectException() {
-		// Get mock, without the constructor being called
-		$Source = $this->getMockBuilder('TestRedisSource')->disableOriginalConstructor()->getMock();
-
-		$unixSocket = '/foo/bar';
-
-		$Source->config = array('unix_socket' => $unixSocket);
-		$Source->_connection = $this->getMock('Redis', array('connect'));
-
-		// Set expectations for connect calls
-		$Source->_connection->expects($this->once())->method('connect')
-			->with($this->equalTo($unixSocket))->will($this->throwException(new RedisException));
-
-		// Now call _connect
-		$reflectedClass = new ReflectionClass('TestRedisSource');
-		$connect = $reflectedClass->getMethod('_connect');
-		$result = $connect->invoke($Source);
-
-		$this->assertFalse($result);
-	}
-
-/**
  * testConnectUnixSocket method
  *
  * @return void
