@@ -380,6 +380,25 @@ class RedisSourceTest extends CakeTestCase {
 	}
 
 /**
+ * testCallExistingFailure method
+ *
+ *  Tests calling of an existing (Redis) method on a disconnected / misconfigured instance.
+ *
+ * @return void
+ * @expectedException RedisSourceException
+ * @expectedExceptionMessage Method (ping) failed: Redis server went away.
+ */
+	public function testCallExistingFailure() {
+		// Get mock, without the constructor being called
+		$Source = new TestRedisSource();
+		$Source->_connection = new Redis();
+		$Source->connected = false;
+
+		// Now call ping
+		$Source->ping();
+	}
+
+/**
  * testNoAuthenticate method
  *
  * @return void
