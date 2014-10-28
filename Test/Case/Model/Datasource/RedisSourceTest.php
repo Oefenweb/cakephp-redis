@@ -253,29 +253,60 @@ class RedisSourceTest extends CakeTestCase {
 	}
 
 /**
- * testCall method
+ * testCallExisting method
+ *
+ *  Tests calling of an existing (Redis) method on a connected / configured instance.
  *
  * @return void
  */
-	public function testCall() {
+	public function testCallExisting() {
 		$Source = new TestRedisSource();
-
-		//
-		// Existing method
-		//
 
 		$result = $Source->ping();
 		$expected = '+PONG';
 
 		$this->assertIdentical($result, $expected);
+	}
 
-		//
-		// Non-existing method
-		//
+/**
+ * testCallNonExisting method
+ *
+ *  Tests calling of an non-existing (Redis) method on a connected / configured instance.
+ *
+ * @return void
+ * @expectedException RedisSourceException
+ */
+	public function testCallNonExisting() {
+		$Source = new TestRedisSource();
 
-		$result = $Source->pang();
+		$Source->pang();
+	}
 
-		$this->assertFalse($result);
+/**
+ * testCallExistingFailure method
+ *
+ *  Tests calling of an existing (Redis) method on a disconnected / misconfigured instance.
+ *
+ * @return void
+ * @expectedException RedisSourceException
+ */
+	public function testCallExistingFailure() {
+		$unixSocket = '';
+		$persistent = false;
+		$host = '127.0.0.1';
+		$port = 63790;
+		$timeout = 0;
+
+		$config = array(
+			'unix_socket' => $unixSocket,
+			'persistent' => $persistent,
+			'host' => $host,
+			'port' => $port,
+			'timeout' => $timeout,
+		);
+
+		$Source = new TestRedisSource($config);
+		$Source->ping();
 	}
 
 /**

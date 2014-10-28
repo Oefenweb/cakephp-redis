@@ -96,14 +96,18 @@ class RedisSource extends DataSource {
  * @param string $name The name of the method being called
  * @param array $arguments An enumerated array containing the parameters passed to the method
  * @return mixed Method return value
- * @todo Throw exception(s)
+ * @throws RedisSourceException
  */
 	public function __call($name, $arguments) {
 		if (!method_exists($this->_connection, $name)) {
-			return false;
+			throw new RedisSourceException(__d('redis', 'Method (%s) does not exist.', $name));
 		}
 
-		return call_user_func_array(array($this->_connection, $name), $arguments);
+		try {
+			return call_user_func_array(array($this->_connection, $name), $arguments);
+		} catch (RedisException $e) {
+			throw new RedisSourceException(__d('redis', 'Method (%s) failed: %s.', $name, $e->getMessage()));
+		}
 	}
 
 /**
@@ -256,4 +260,11 @@ class RedisSource extends DataSource {
 		return array('count' => true);
 	}
 
+}
+
+/**
+ * Redis Source Exception class.
+ *
+ */
+class RedisSourceException extends CakeException {
 }
