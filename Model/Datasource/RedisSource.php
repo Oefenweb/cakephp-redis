@@ -220,7 +220,6 @@ class RedisSource extends DataSource {
  * @return bool Always true
  */
 	public function close() {
-		// TODO: Remove useless condition
 		if ($this->isConnected()) {
 			$this->_connection->close();
 		}
@@ -245,7 +244,6 @@ class RedisSource extends DataSource {
  *
  * @param mixed $data List of tables
  * @return array Array of sources available in this datasource
- * @todo: Remove useless method?
  */
 	public function listSources($data = null) {
 		return parent::listSources($data);
@@ -256,23 +254,9 @@ class RedisSource extends DataSource {
  *
  * @param Model|string $model Name of database table to inspect or model instance
  * @return array Array of Metadata for the $model
- * @todo: Remove useless method?
  */
 	public function describe($model) {
 		return parent::describe($model);
-	}
-
-/**
- * Returns an SQL calculation, i.e. COUNT() or MAX()
- *
- * @param Model $Model The model to get a calculated field for
- * @param string $func Lowercase name of SQL function, i.e. 'count' or 'max'
- * @param array $params Function parameters (any values must be quoted manually)
- * @return string An SQL calculation function
- * @todo Remove useless method?
- */
-	public function calculate(Model $Model, $func, $params = array()) {
-		return array('count' => true);
 	}
 
 }

@@ -688,21 +688,4 @@ class RedisSourceTest extends CakeTestCase {
 		$this->assertNull($result);
 	}
 
-/**
- * testCalculate method
- *
- * @return void
- */
-	public function testCalculate() {
-		$Source = new TestRedisSource();
-		$Model = $this->getMockForModel('Model');
-		$func = 'foo';
-		$params = array('b', 'a', 'r');
-
-		$result = $Source->calculate($Model, $func, $params);
-		$expected = array('count' => true);
-
-		$this->assertIdentical($expected, $result);
-	}
-
 }
