@@ -63,12 +63,13 @@ class RedisSource extends DataSource {
  *
  * @param array $config Array of configuration information for the Datasource
  * @return bool True if connecting to the DataSource succeeds, else false
+ * @throws RedisSourceException
  */
 	public function __construct($config = array()) {
 		parent::__construct($config);
 
 		if (!$this->enabled()) {
-			return false;
+			throw new RedisSourceException(__d('redis', 'Extension is not loaded.'));
 		}
 
 		$this->_connection = new Redis();

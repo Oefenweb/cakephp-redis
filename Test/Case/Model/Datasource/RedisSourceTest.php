@@ -91,6 +91,7 @@ class RedisSourceTest extends CakeTestCase {
  *
  *  Tests that `connect` will never be called when redis extension is not loaded.
  *
+ * @expectedException RedisSourceException
  * @return void
  */
 	public function testConstructExtensionNotLoaded() {
