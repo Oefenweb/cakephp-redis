@@ -123,19 +123,33 @@ class RedisSource extends DataSource {
 /**
  * Connects to the database using options in the given configuration array.
  *
- *  "Connects mean:
+ *  "Connects" means:
  *  - connect
  *  - authenticate
  *  - select
  *  - setPrefix
  *
- * @return bool
+ * @return bool True if all of the above steps succeed, else false
+ * @throws RedisSourceException
  */
 	public function connect() {
-		$this->connected = $this->_connect();
-		$this->connected = $this->connected && $this->_authenticate();
-		$this->connected = $this->connected && $this->_select();
-		$this->connected = $this->connected && $this->_setPrefix();
+		if (!$this->_connect()) {
+			throw new RedisSourceException(__d('redis', 'Could not connect.'));
+		}
+
+		if (!$this->_authenticate()) {
+			throw new RedisSourceException(__d('redis', 'Could not authenticate.'));
+		}
+
+		if (!$this->_select()) {
+			throw new RedisSourceException(__d('redis', 'Could not select.'));
+		}
+
+		if (!$this->_setPrefix()) {
+			throw new RedisSourceException(__d('redis', 'Could not set prefix.'));
+		}
+
+		$this->connected = true;
 
 		return $this->connected;
 	}
