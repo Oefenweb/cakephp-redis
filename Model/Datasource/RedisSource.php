@@ -160,18 +160,18 @@ class RedisSource extends DataSource {
  * @return bool True if connecting to the DataSource succeeds, else false
  */
 	protected function _connect() {
-		if ($this->config['unix_socket']) {
-			return $this->_connection->connect($this->config['unix_socket']);
-		} elseif (!$this->config['persistent']) {
-			return $this->_connection->connect(
-				$this->config['host'], $this->config['port'], $this->config['timeout']
-			);
-		} else {
-			$persistentId = crc32(serialize($this->config));
+		$unixSocket = $this->config['unix_socket'];
+		$persistent = $this->config['persistent'];
+		$host = $this->config['host'];
+		$port = $this->config['port'];
+		$timeout = $this->config['timeout'];
 
-			return $this->_connection->pconnect(
-				$this->config['host'], $this->config['port'], $this->config['timeout'], $persistentId
-			);
+		if ($unixSocket) {
+			return $this->_connection->connect($unixSocket);
+		} elseif ($persistent) {
+			return $this->_connection->pconnect($host, $port, $timeout, $persistent);
+		} else {
+			return $this->_connection->connect($host, $port, $timeout);
 		}
 	}
 

@@ -258,8 +258,18 @@ class RedisSourceTest extends CakeTestCase {
 		$Source = $this->getMockBuilder('TestRedisSource')->disableOriginalConstructor()->getMock();
 
 		$unixSocket = '/foo/bar';
+		$persistent = false;
+		$host = 'foo';
+		$port = 'bar';
+		$timeout = 0;
 
-		$Source->config = array('unix_socket' => $unixSocket);
+		$Source->config = array(
+			'unix_socket' => $unixSocket,
+			'persistent' => $persistent,
+			'host' => $host,
+			'port' => $port,
+			'timeout' => $timeout,
+		);
 		$Source->_connection = $this->getMock('Redis', array('connect'));
 
 		// Set expectations for connect calls
