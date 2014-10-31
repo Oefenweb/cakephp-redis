@@ -91,6 +91,8 @@ class RedisSourceTest extends CakeTestCase {
  *
  *  Tests that `connect` will never be called when redis extension is not loaded.
  *
+ * @expectedException RedisSourceException
+ * @expectedExceptionMessage Extension is not loaded.
  * @return void
  */
 	public function testConstructExtensionNotLoaded() {
@@ -134,6 +136,100 @@ class RedisSourceTest extends CakeTestCase {
 	}
 
 /**
+ * testConnectFailedConnect method
+ *
+ *  Tests that an exception in thrown when `_connect` fails.
+ *
+ * @expectedException RedisSourceException
+ * @expectedExceptionMessage Could not connect.
+ * @return void
+ */
+	public function testConnectFailedConnect() {
+		// Get mock, without the constructor being called
+		$Source = $this->getMockBuilder('TestRedisSource')->disableOriginalConstructor()->getMock();
+
+		// Set expectations for connect calls
+		$Source->expects($this->once())->method('_connect')->will($this->returnValue(false));
+
+		// Now call connect
+		$reflectedClass = new ReflectionClass('TestRedisSource');
+		$connect = $reflectedClass->getMethod('connect');
+		$connect->invoke($Source);
+	}
+
+/**
+ * testConnectFailedAuthenticate method
+ *
+ *  Tests that an exception in thrown when `_authenticate` fails.
+ *
+ * @expectedException RedisSourceException
+ * @expectedExceptionMessage Could not authenticate.
+ * @return void
+ */
+	public function testConnectFailedAuthenticate() {
+		// Get mock, without the constructor being called
+		$Source = $this->getMockBuilder('TestRedisSource')->disableOriginalConstructor()->getMock();
+
+		// Set expectations for connect calls
+		$Source->expects($this->once())->method('_connect')->will($this->returnValue(true));
+		$Source->expects($this->once())->method('_authenticate')->will($this->returnValue(false));
+
+		// Now call connect
+		$reflectedClass = new ReflectionClass('TestRedisSource');
+		$connect = $reflectedClass->getMethod('connect');
+		$connect->invoke($Source);
+	}
+
+/**
+ * testConnectFailedSelect method
+ *
+ *  Tests that an exception in thrown when `_select` fails.
+ *
+ * @expectedException RedisSourceException
+ * @expectedExceptionMessage Could not select.
+ * @return void
+ */
+	public function testConnectFailedSelect() {
+		// Get mock, without the constructor being called
+		$Source = $this->getMockBuilder('TestRedisSource')->disableOriginalConstructor()->getMock();
+
+		// Set expectations for connect calls
+		$Source->expects($this->once())->method('_connect')->will($this->returnValue(true));
+		$Source->expects($this->once())->method('_authenticate')->will($this->returnValue(true));
+		$Source->expects($this->once())->method('_select')->will($this->returnValue(false));
+
+		// Now call connect
+		$reflectedClass = new ReflectionClass('TestRedisSource');
+		$connect = $reflectedClass->getMethod('connect');
+		$connect->invoke($Source);
+	}
+
+/**
+ * testConnectFailedSetPrefix method
+ *
+ *  Tests that an exception in thrown when `_setPrefix` fails.
+ *
+ * @expectedException RedisSourceException
+ * @expectedExceptionMessage Could not set prefix.
+ * @return void
+ */
+	public function testConnectFailedSetPrefix() {
+		// Get mock, without the constructor being called
+		$Source = $this->getMockBuilder('TestRedisSource')->disableOriginalConstructor()->getMock();
+
+		// Set expectations for connect calls
+		$Source->expects($this->once())->method('_connect')->will($this->returnValue(true));
+		$Source->expects($this->once())->method('_authenticate')->will($this->returnValue(true));
+		$Source->expects($this->once())->method('_select')->will($this->returnValue(true));
+		$Source->expects($this->once())->method('_setPrefix')->will($this->returnValue(false));
+
+		// Now call connect
+		$reflectedClass = new ReflectionClass('TestRedisSource');
+		$connect = $reflectedClass->getMethod('connect');
+		$connect->invoke($Source);
+	}
+
+/**
  * testConnected method
  *
  * @return void
@@ -153,32 +249,6 @@ class RedisSourceTest extends CakeTestCase {
 	}
 
 /**
- * testConnectException method
- *
- * @return void
- */
-	public function testConnectException() {
-		// Get mock, without the constructor being called
-		$Source = $this->getMockBuilder('TestRedisSource')->disableOriginalConstructor()->getMock();
-
-		$unixSocket = '/foo/bar';
-
-		$Source->config = array('unix_socket' => $unixSocket);
-		$Source->_connection = $this->getMock('Redis', array('connect'));
-
-		// Set expectations for connect calls
-		$Source->_connection->expects($this->once())->method('connect')
-			->with($this->equalTo($unixSocket))->will($this->throwException(new RedisException));
-
-		// Now call _connect
-		$reflectedClass = new ReflectionClass('TestRedisSource');
-		$connect = $reflectedClass->getMethod('_connect');
-		$result = $connect->invoke($Source);
-
-		$this->assertFalse($result);
-	}
-
-/**
  * testConnectUnixSocket method
  *
  * @return void
@@ -188,8 +258,18 @@ class RedisSourceTest extends CakeTestCase {
 		$Source = $this->getMockBuilder('TestRedisSource')->disableOriginalConstructor()->getMock();
 
 		$unixSocket = '/foo/bar';
+		$persistent = false;
+		$host = 'foo';
+		$port = 'bar';
+		$timeout = 0;
 
-		$Source->config = array('unix_socket' => $unixSocket);
+		$Source->config = array(
+			'unix_socket' => $unixSocket,
+			'persistent' => $persistent,
+			'host' => $host,
+			'port' => $port,
+			'timeout' => $timeout,
+		);
 		$Source->_connection = $this->getMock('Redis', array('connect'));
 
 		// Set expectations for connect calls
@@ -279,29 +359,53 @@ class RedisSourceTest extends CakeTestCase {
 	}
 
 /**
- * testCall method
+ * testCallExisting method
+ *
+ *  Tests calling of an existing (Redis) method on a connected / configured instance.
  *
  * @return void
  */
-	public function testCall() {
+	public function testCallExisting() {
 		$Source = new TestRedisSource();
-
-		//
-		// Existing method
-		//
 
 		$result = $Source->ping();
 		$expected = '+PONG';
 
 		$this->assertIdentical($result, $expected);
+	}
 
-		//
-		// Non-existing method
-		//
+/**
+ * testCallNonExisting method
+ *
+ *  Tests calling of an non-existing (Redis) method on a connected / configured instance.
+ *
+ * @return void
+ * @expectedException RedisSourceException
+ * @expectedExceptionMessage Method (pang) does not exist.
+ */
+	public function testCallNonExisting() {
+		$Source = new TestRedisSource();
 
-		$result = $Source->pang();
+		$Source->pang();
+	}
 
-		$this->assertFalse($result);
+/**
+ * testCallExistingFailure method
+ *
+ *  Tests calling of an existing (Redis) method on a disconnected / misconfigured instance.
+ *
+ * @return void
+ * @expectedException RedisSourceException
+ * @expectedExceptionMessage Method (ping) failed: Redis server went away.
+ */
+	public function testCallExistingFailure() {
+		// Get mock, without the constructor being called
+		$Source = new TestRedisSource();
+		$Source->_connection = new Redis();
+		$Source->connected = false;
+
+		// Now call ping
+		$Source->ping();
 	}
 
 /**
@@ -592,23 +696,6 @@ class RedisSourceTest extends CakeTestCase {
 		$result = $Source->describe($Model);
 
 		$this->assertNull($result);
-	}
-
-/**
- * testCalculate method
- *
- * @return void
- */
-	public function testCalculate() {
-		$Source = new TestRedisSource();
-		$Model = $this->getMockForModel('Model');
-		$func = 'foo';
-		$params = array('b', 'a', 'r');
-
-		$result = $Source->calculate($Model, $func, $params);
-		$expected = array('count' => true);
-
-		$this->assertIdentical($expected, $result);
 	}
 
 }

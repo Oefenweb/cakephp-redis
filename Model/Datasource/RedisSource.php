@@ -63,12 +63,13 @@ class RedisSource extends DataSource {
  *
  * @param array $config Array of configuration information for the Datasource
  * @return bool True if connecting to the DataSource succeeds, else false
+ * @throws RedisSourceException
  */
 	public function __construct($config = array()) {
 		parent::__construct($config);
 
 		if (!$this->enabled()) {
-			return false;
+			throw new RedisSourceException(__d('redis', 'Extension is not loaded.'));
 		}
 
 		$this->_connection = new Redis();
@@ -96,14 +97,18 @@ class RedisSource extends DataSource {
  * @param string $name The name of the method being called
  * @param array $arguments An enumerated array containing the parameters passed to the method
  * @return mixed Method return value
- * @todo Throw exception(s)
+ * @throws RedisSourceException
  */
 	public function __call($name, $arguments) {
 		if (!method_exists($this->_connection, $name)) {
-			return false;
+			throw new RedisSourceException(__d('redis', 'Method (%s) does not exist.', $name));
 		}
 
-		return call_user_func_array(array($this->_connection, $name), $arguments);
+		try {
+			return call_user_func_array(array($this->_connection, $name), $arguments);
+		} catch (RedisException $e) {
+			throw new RedisSourceException(__d('redis', 'Method (%s) failed: %s.', $name, $e->getMessage()));
+		}
 	}
 
 /**
@@ -118,19 +123,33 @@ class RedisSource extends DataSource {
 /**
  * Connects to the database using options in the given configuration array.
  *
- *  "Connects mean:
+ *  "Connects" means:
  *  - connect
  *  - authenticate
  *  - select
  *  - setPrefix
  *
- * @return bool
+ * @return bool True if all of the above steps succeed, else false
+ * @throws RedisSourceException
  */
 	public function connect() {
-		$this->connected = $this->_connect();
-		$this->connected = $this->connected && $this->_authenticate();
-		$this->connected = $this->connected && $this->_select();
-		$this->connected = $this->connected && $this->_setPrefix();
+		if (!$this->_connect()) {
+			throw new RedisSourceException(__d('redis', 'Could not connect.'));
+		}
+
+		if (!$this->_authenticate()) {
+			throw new RedisSourceException(__d('redis', 'Could not authenticate.'));
+		}
+
+		if (!$this->_select()) {
+			throw new RedisSourceException(__d('redis', 'Could not select.'));
+		}
+
+		if (!$this->_setPrefix()) {
+			throw new RedisSourceException(__d('redis', 'Could not set prefix.'));
+		}
+
+		$this->connected = true;
 
 		return $this->connected;
 	}
@@ -141,23 +160,18 @@ class RedisSource extends DataSource {
  * @return bool True if connecting to the DataSource succeeds, else false
  */
 	protected function _connect() {
-		// TODO: Remove useless try / catch?
-		try {
-			if ($this->config['unix_socket']) {
-				return $this->_connection->connect($this->config['unix_socket']);
-			} elseif (!$this->config['persistent']) {
-				return $this->_connection->connect(
-					$this->config['host'], $this->config['port'], $this->config['timeout']
-				);
-			} else {
-				$persistentId = crc32(serialize($this->config));
+		$unixSocket = $this->config['unix_socket'];
+		$persistent = $this->config['persistent'];
+		$host = $this->config['host'];
+		$port = $this->config['port'];
+		$timeout = $this->config['timeout'];
 
-				return $this->_connection->pconnect(
-					$this->config['host'], $this->config['port'], $this->config['timeout'], $persistentId
-				);
-			}
-		} catch (RedisException $e) {
-			return false;
+		if ($unixSocket) {
+			return $this->_connection->connect($unixSocket);
+		} elseif ($persistent) {
+			return $this->_connection->pconnect($host, $port, $timeout, $persistent);
+		} else {
+			return $this->_connection->connect($host, $port, $timeout);
 		}
 	}
 
@@ -206,7 +220,6 @@ class RedisSource extends DataSource {
  * @return bool Always true
  */
 	public function close() {
-		// TODO: Remove useless condition
 		if ($this->isConnected()) {
 			$this->_connection->close();
 		}
@@ -231,7 +244,6 @@ class RedisSource extends DataSource {
  *
  * @param mixed $data List of tables
  * @return array Array of sources available in this datasource
- * @todo: Remove useless method?
  */
 	public function listSources($data = null) {
 		return parent::listSources($data);
@@ -242,23 +254,16 @@ class RedisSource extends DataSource {
  *
  * @param Model|string $model Name of database table to inspect or model instance
  * @return array Array of Metadata for the $model
- * @todo: Remove useless method?
  */
 	public function describe($model) {
 		return parent::describe($model);
 	}
 
-/**
- * Returns an SQL calculation, i.e. COUNT() or MAX()
- *
- * @param Model $Model The model to get a calculated field for
- * @param string $func Lowercase name of SQL function, i.e. 'count' or 'max'
- * @param array $params Function parameters (any values must be quoted manually)
- * @return string An SQL calculation function
- * @todo Remove useless method?
- */
-	public function calculate(Model $Model, $func, $params = array()) {
-		return array('count' => true);
-	}
+}
 
+/**
+ * Redis Source Exception class.
+ *
+ */
+class RedisSourceException extends CakeException {
 }
