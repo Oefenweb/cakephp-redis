@@ -29,7 +29,7 @@ matrix:
         - COVERALLS=1
     - php: 5.3
       env:
-        - PHPCS=1 PHPCS_ARGS="-p --extensions=php --standard=CakePHP -n ."
+        - PHPCS=1 PHPCS_ARGS="-p --extensions=php --standard=CakePHP --ignore=vendor/ -n ."
     - php: 5.3
       env:
         - FOC_VALIDATE=1
