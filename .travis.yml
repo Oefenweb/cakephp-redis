@@ -43,7 +43,7 @@ before_script:
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - phpenv rehash
   - git clone -b master https://github.com/FriendsOfCake/travis.git --depth 1 ../travis
-  - ../travis/before_script.sh
+  - travis_wait ../travis/before_script.sh
 
 script:
   - ../travis/script.sh
