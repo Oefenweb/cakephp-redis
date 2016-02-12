@@ -1,7 +1,6 @@
 language: php
 
 php:
-  - 5.3
   - 5.4
   - 5.5
   - 5.6
@@ -30,7 +29,7 @@ matrix:
         - COVERALLS=1
     - php: 5.6
       env:
-        - PHPCS=1 PHPCS_ARGS="-p --extensions=php --standard=CakePHP --ignore=vendor/ -n ."
+        - PHPCS=1
     - php: 5.6
       env:
         - FOC_VALIDATE=1
@@ -42,7 +41,7 @@ branches:
 before_script:
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - phpenv rehash
-  - git clone -b master https://github.com/FriendsOfCake/travis.git --depth 1 ../travis
+  - git clone -b master https://github.com/Oefenweb/travis --depth 1 ../travis
   - travis_wait ../travis/before_script.sh
 
 script:
