@@ -263,14 +263,14 @@ class RedisSourceTest extends CakeTestCase {
 		$port = 'bar';
 		$timeout = 0;
 
-		$Source->config = array(
+		$Source->config = [
 			'unix_socket' => $unixSocket,
 			'persistent' => $persistent,
 			'host' => $host,
 			'port' => $port,
 			'timeout' => $timeout,
-		);
-		$Source->_connection = $this->getMock('Redis', array('connect'));
+		];
+		$Source->_connection = $this->getMock('Redis', ['connect']);
 
 		// Set expectations for connect calls
 		$Source->_connection->expects($this->once())->method('connect')
@@ -299,14 +299,14 @@ class RedisSourceTest extends CakeTestCase {
 		$port = 'bar';
 		$timeout = 0;
 
-		$Source->config = array(
+		$Source->config = [
 			'unix_socket' => $unixSocket,
 			'persistent' => $persistent,
 			'host' => $host,
 			'port' => $port,
 			'timeout' => $timeout,
-		);
-		$Source->_connection = $this->getMock('Redis', array('connect'));
+		];
+		$Source->_connection = $this->getMock('Redis', ['connect']);
 
 		// Set expectations for connect calls
 		$Source->_connection->expects($this->once())->method('connect')
@@ -336,14 +336,14 @@ class RedisSourceTest extends CakeTestCase {
 		$port = 'bar';
 		$timeout = 0;
 
-		$Source->config = array(
+		$Source->config = [
 			'unix_socket' => $unixSocket,
 			'persistent' => $persistent,
 			'host' => $host,
 			'port' => $port,
 			'timeout' => $timeout,
-		);
-		$Source->_connection = $this->getMock('Redis', array('pconnect'));
+		];
+		$Source->_connection = $this->getMock('Redis', ['pconnect']);
 
 		// Set expectations for pconnect calls
 		$Source->_connection->expects($this->once())->method('pconnect')
@@ -419,8 +419,8 @@ class RedisSourceTest extends CakeTestCase {
 
 		$password = '';
 
-		$Source->config = array('password' => $password);
-		$Source->_connection = $this->getMock('Redis', array('auth'));
+		$Source->config = ['password' => $password];
+		$Source->_connection = $this->getMock('Redis', ['auth']);
 
 		// Set expectations for constructor calls
 		$Source->_connection->expects($this->never())->method('auth');
@@ -444,8 +444,8 @@ class RedisSourceTest extends CakeTestCase {
 
 		$password = 'foo';
 
-		$Source->config = array('password' => $password);
-		$Source->_connection = $this->getMock('Redis', array('auth'));
+		$Source->config = ['password' => $password];
+		$Source->_connection = $this->getMock('Redis', ['auth']);
 
 		// Set expectations for auth calls
 		$Source->_connection->expects($this->once())->method('auth')
@@ -470,8 +470,8 @@ class RedisSourceTest extends CakeTestCase {
 
 		$password = 'foo';
 
-		$Source->config = array('password' => $password);
-		$Source->_connection = $this->getMock('Redis', array('auth'));
+		$Source->config = ['password' => $password];
+		$Source->_connection = $this->getMock('Redis', ['auth']);
 
 		// Set expectations for auth calls
 		$Source->_connection->expects($this->once())->method('auth')
@@ -496,8 +496,8 @@ class RedisSourceTest extends CakeTestCase {
 
 		$database = '';
 
-		$Source->config = array('database' => $database);
-		$Source->_connection = $this->getMock('Redis', array('select'));
+		$Source->config = ['database' => $database];
+		$Source->_connection = $this->getMock('Redis', ['select']);
 
 		// Set expectations for select calls
 		$Source->_connection->expects($this->never())->method('select');
@@ -521,8 +521,8 @@ class RedisSourceTest extends CakeTestCase {
 
 		$database = 'foo';
 
-		$Source->config = array('database' => $database);
-		$Source->_connection = $this->getMock('Redis', array('select'));
+		$Source->config = ['database' => $database];
+		$Source->_connection = $this->getMock('Redis', ['select']);
 
 		// Set expectations for select calls
 		$Source->_connection->expects($this->once())->method('select')
@@ -547,8 +547,8 @@ class RedisSourceTest extends CakeTestCase {
 
 		$database = 'foo';
 
-		$Source->config = array('database' => $database);
-		$Source->_connection = $this->getMock('Redis', array('select'));
+		$Source->config = ['database' => $database];
+		$Source->_connection = $this->getMock('Redis', ['select']);
 
 		// Set expectations for select calls
 		$Source->_connection->expects($this->once())->method('select')
@@ -573,8 +573,8 @@ class RedisSourceTest extends CakeTestCase {
 
 		$prefix = '';
 
-		$Source->config = array('prefix' => $prefix);
-		$Source->_connection = $this->getMock('Redis', array('setOption'));
+		$Source->config = ['prefix' => $prefix];
+		$Source->_connection = $this->getMock('Redis', ['setOption']);
 
 		// Set expectations for setOption calls
 		$Source->_connection->expects($this->never())->method('setOption');
@@ -598,8 +598,8 @@ class RedisSourceTest extends CakeTestCase {
 
 		$prefix = 'foo';
 
-		$Source->config = array('prefix' => $prefix);
-		$Source->_connection = $this->getMock('Redis', array('setOption'));
+		$Source->config = ['prefix' => $prefix];
+		$Source->_connection = $this->getMock('Redis', ['setOption']);
 
 		// Set expectations for setOption calls
 		$Source->_connection->expects($this->once())->method('setOption')
@@ -624,8 +624,8 @@ class RedisSourceTest extends CakeTestCase {
 
 		$prefix = 'foo';
 
-		$Source->config = array('prefix' => $prefix);
-		$Source->_connection = $this->getMock('Redis', array('setOption'));
+		$Source->config = ['prefix' => $prefix];
+		$Source->_connection = $this->getMock('Redis', ['setOption']);
 
 		// Set expectations for setOption calls
 		$Source->_connection->expects($this->once())->method('setOption')
@@ -643,7 +643,7 @@ class RedisSourceTest extends CakeTestCase {
 		$Source = new TestRedisSource();
 
 		$Source->connected = false;
-		$Source->_connection = $this->getMock('Redis', array('close'));
+		$Source->_connection = $this->getMock('Redis', ['close']);
 
 		// Set expectations for close calls
 		$Source->_connection->expects($this->never())->method('close');
@@ -659,7 +659,7 @@ class RedisSourceTest extends CakeTestCase {
 		$Source = new TestRedisSource();
 
 		$Source->connected = true;
-		$Source->_connection = $this->getMock('Redis', array('close'));
+		$Source->_connection = $this->getMock('Redis', ['close']);
 
 		// Set expectations for close calls
 		$Source->_connection->expects($this->once())->method('close');
