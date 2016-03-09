@@ -19,7 +19,7 @@ class RedisSource extends DataSource {
  *
  * @var array
  */
-	protected $_baseConfig = array(
+	protected $_baseConfig = [
 		'host' => '127.0.0.1',
 		'port' => 6379,
 		'password' => '',
@@ -28,14 +28,14 @@ class RedisSource extends DataSource {
 		'persistent' => false,
 		'unix_socket' => '',
 		'prefix' => '',
-	);
+	];
 
 /**
  * Configuration.
  *
  * @var array
  */
-	public $config = array();
+	public $config = [];
 
 /**
  * A reference to the physical connection of this DataSource.
@@ -65,7 +65,7 @@ class RedisSource extends DataSource {
  * @return bool True if connecting to the DataSource succeeds, else false
  * @throws RedisSourceException
  */
-	public function __construct($config = array()) {
+	public function __construct($config = []) {
 		parent::__construct($config);
 
 		if (!$this->enabled()) {
@@ -105,7 +105,7 @@ class RedisSource extends DataSource {
 		}
 
 		try {
-			return call_user_func_array(array($this->_connection, $name), $arguments);
+			return call_user_func_array([$this->_connection, $name], $arguments);
 		} catch (RedisException $e) {
 			throw new RedisSourceException(__d('redis', 'Method (%s) failed: %s.', $name, $e->getMessage()));
 		}
