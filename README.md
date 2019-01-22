@@ -1,13 +1,17 @@
 # Redis plugin for CakePHP
 
-[![Build Status](https://travis-ci.org/Oefenweb/cakephp-redis.png?branch=master)](https://travis-ci.org/Oefenweb/cakephp-redis) [![PHP 7 ready](http://php7ready.timesplinter.ch/Oefenweb/cakephp-redis/badge.svg)](https://travis-ci.org/Oefenweb/cakephp-redis) [![Coverage Status](https://codecov.io/gh/Oefenweb/cakephp-redis/branch/master/graph/badge.svg)](https://codecov.io/gh/Oefenweb/cakephp-redis) [![Packagist downloads](http://img.shields.io/packagist/dt/Oefenweb/cakephp-redis.svg)](https://packagist.org/packages/oefenweb/cakephp-redis) [![Code Climate](https://codeclimate.com/github/Oefenweb/cakephp-redis/badges/gpa.svg)](https://codeclimate.com/github/Oefenweb/cakephp-redis)
+[![Build Status](https://travis-ci.org/Oefenweb/cakephp-redis.png?branch=master)](https://travis-ci.org/Oefenweb/cakephp-redis)
+[![PHP 7 ready](http://php7ready.timesplinter.ch/Oefenweb/cakephp-redis/badge.svg)](https://travis-ci.org/Oefenweb/cakephp-redis)
+[![Coverage Status](https://codecov.io/gh/Oefenweb/cakephp-redis/branch/master/graph/badge.svg)](https://codecov.io/gh/Oefenweb/cakephp-redis)
+[![Packagist downloads](http://img.shields.io/packagist/dt/Oefenweb/cakephp-redis.svg)](https://packagist.org/packages/oefenweb/cakephp-redis)
+[![Code Climate](https://codeclimate.com/github/Oefenweb/cakephp-redis/badges/gpa.svg)](https://codeclimate.com/github/Oefenweb/cakephp-redis)
 
 Redis (DataSource) Plugin for CakePHP
 
 ## Requirements
 
-* CakePHP 2.6.0 or greater.
-* PHP 5.4.16 or greater.
+* CakePHP 2.9.0 or greater.
+* PHP 7.0.0 or greater.
 * PhpRedis.
 
 ## Installation
@@ -42,7 +46,7 @@ CakePlugin::load('Redis');
 <?php
 class DATABASE_CONFIG {
 
-	public $redis = array(
+	public $redis = [
 		'datasource' => 'Redis.RedisSource',
 		'host' => '127.0.0.1',
 		'port' => 6379,
@@ -52,7 +56,7 @@ class DATABASE_CONFIG {
 		'persistent' => false,
 		'unix_socket' => '',
 		'prefix' => '',
-	);
+	];
 ```
 
 ## Usage
