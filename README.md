@@ -5,6 +5,7 @@
 [![Coverage Status](https://codecov.io/gh/Oefenweb/cakephp-redis/branch/master/graph/badge.svg)](https://codecov.io/gh/Oefenweb/cakephp-redis)
 [![Packagist downloads](http://img.shields.io/packagist/dt/Oefenweb/cakephp-redis.svg)](https://packagist.org/packages/oefenweb/cakephp-redis)
 [![Code Climate](https://codeclimate.com/github/Oefenweb/cakephp-redis/badges/gpa.svg)](https://codeclimate.com/github/Oefenweb/cakephp-redis)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Oefenweb/cakephp-redis/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Oefenweb/cakephp-redis/?branch=master)
 
 Redis (DataSource) Plugin for CakePHP
 
